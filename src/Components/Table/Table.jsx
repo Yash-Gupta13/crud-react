@@ -9,12 +9,21 @@ import axios from "axios";
 
 
 
-const Table = ({contactList}) => {
+const Table = ({ contactList, handleChildData ,onDelete}) => {
+  const [isSelect, setIsSelect] = useState(false);
+  const handleRowClick = async (id) => {
+    setIsSelect(!isSelect);
+    const res = await axios.get(
+      `https://demobackend.web2.99cloudhosting.com/user/get_details?id=${id}`
+    );
 
-  const handleRowClick = async(id)=>{
-    const res = await axios.get(``)
-  }
+    handleChildData({data:res.data.contact_details,id:id});
+    console.log(res.data);
+  };
+
   
+  
+
   return (
     <div className="tableContainer">
       <table>
@@ -33,9 +42,9 @@ const Table = ({contactList}) => {
         <tbody>
           {contactList?.map((contact, index) => (
             <tr key={index}>
-              <td>
+              <td className="checkbox">
                 <span
-                  className="selectTable"
+                  className={`selectTable ${isSelect} ? "selected" : ""`}
                   onClick={() => handleRowClick(contact.id)}
                 ></span>
               </td>
@@ -50,15 +59,12 @@ const Table = ({contactList}) => {
               <td>{`${contact.contact_name}, ${contact.contact_address}`}</td>
               <td>{contact.contact_number}</td>
               <td>
-                {moment(contact.created_on * 1000).format("DD/MM/YY hh:mm A")}
+                {moment.unix(contact.created_on).format("DD/MM/YY hh:mm A")}
               </td>
               <td className="status">{contact.contact_status}</td>
               <td>{contact.contact_notes}</td>
               <td>
-                <div
-                  className="deletebtn"
-                  onClick={() => handleDelete(contact.id)}
-                >
+                <div className="deletebtn" onClick={() => onDelete(contact.id)}>
                   <img src={RecycleBin} alt="" />
                 </div>
               </td>

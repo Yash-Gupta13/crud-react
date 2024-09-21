@@ -37,17 +37,6 @@ const AddContactCard = () => {
     }
   };
 
-  const convertToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        resolve(reader.result); // Base64 string
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file); // Read the file as a base64 string
-    });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -68,6 +57,10 @@ const AddContactCard = () => {
       );
 
       const id = res.data.record.id;
+      if(formData.Image === null){
+        alert('Please select the image');
+        return;
+      }
       const image = await axios.post(
         `https://demobackend.web2.99cloudhosting.com/profile_pic/add_contact_pic`,
         {

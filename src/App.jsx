@@ -9,21 +9,46 @@ import axios from "axios";
 function App() {
   const [contactList, setContactList] = useState([]);
 
+  const [singleContactDetails , setSingleContactDetails] = useState('');
+  const [singleContactDetailsId, setSingleContactsDetailsId] = useState('');
+
+  const handleSingleDetails = (data)=>{
+    setSingleContactDetails(data.data);
+    setSingleContactsDetailsId(data.id)
+  }
+
   const fetchData = async()=>{
     try {
       const response = await axios.get(
-        `https://demobackend.web2.99cloudhosting.com/user/list_contacts`
+        `https://demobackend.web2.99cloudhosting.com/user/list_contacts?rows=20`
       );
 
       const contacts = response.data.record;
       setContactList(contacts);
-      // setContactList(contactWithPics);
     } catch (error) {
       
     }
   }
 
-  
+  const handleDelete = async(id)=>{
+    const confirm = window.confirm("Are you sure you want to delete?")
+
+    if(!confirm){
+      return;
+    }
+
+    const res = await axios.post(
+      `https://demobackend.web2.99cloudhosting.com/user/delete_contact`,{
+        "contact_id":id
+      }
+    );
+
+    setSingleContactDetails('');
+    setSingleContactsDetailsId('');
+
+    fetchData();
+    
+  }
 
   useEffect(()=>{
     fetchData();
@@ -34,12 +59,12 @@ function App() {
         <Sidebar />
         <div className="mainContent">
           <div className="mainCard">
-            {/* <ContactCard /> */}
+            <ContactCard data={singleContactDetails} id={singleContactDetailsId} onDelete={handleDelete}/>
             <AddContactCard />
           </div>
 
           <div className="div">
-            <Table contactList={contactList}/>
+            <Table contactList={contactList} handleChildData ={handleSingleDetails} onDelete={handleDelete}/>
           </div>
         </div>
       </div>
