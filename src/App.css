@@ -1,0 +1,70 @@
+:root {
+  --backgroundColor  : #E6E6E6;
+  --buttonPrimary : #D83862;
+  --buttonSecondary: #7C398F;
+  --textColor : #7d7d7d;
+  --sidebar:linear-gradient(
+  180deg,
+  hsl(344deg 68% 54%) 0%,
+  hsl(343deg 65% 53%) 5%,
+  hsl(341deg 62% 52%) 11%,
+  hsl(340deg 60% 51%) 18%,
+  hsl(338deg 57% 50%) 26%,
+  hsl(337deg 57% 49%) 35%,
+  hsl(335deg 57% 48%) 45%,
+  hsl(333deg 56% 47%) 54%,
+  hsl(331deg 56% 46%) 63%,
+  hsl(329deg 55% 45%) 70%,
+  hsl(327deg 55% 44%) 77%,
+  hsl(326deg 55% 44%) 82%,
+  hsl(324deg 55% 43%) 87%,
+  hsl(323deg 54% 42%) 91%,
+  hsl(321deg 54% 42%) 94%,
+  hsl(319deg 54% 41%) 96%,
+  hsl(317deg 53% 40%) 98%,
+  hsl(315deg 53% 40%) 99%,
+  hsl(313deg 53% 39%) 100%
+);
+}
+
+.mainContainer{
+  display: flex;
+  width: 100%;
+  
+  
+}
+
+.mainCard{
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+
+}
+
+.mainContent{
+  display: flex;
+  width: 100%;
+  padding: 20px;
+  gap: 40px;
+  flex-direction: column;
+
+}
+
+@media (max-width: 765px){
+  .mainContainer{
+    flex-direction: column;
+  }
+
+  .mainCard{
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mainContent{
+    padding: 9px;
+  }
+}
+
+@media (min-width: 766px) and (max-width: 1024px){
+  
+ }

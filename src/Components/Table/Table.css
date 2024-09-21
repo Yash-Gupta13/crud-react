@@ -1,0 +1,81 @@
+.tableContainer{
+    width: 100%;
+    background-color: white;
+    box-shadow: 0px 4px 12px 0px rgba(173,173,173,1);
+}
+
+table{
+    width: 100%;
+    border-collapse: collapse;
+
+    th  {
+    padding: 12px 12px 20px 12px;
+    border-bottom: 1px solid var(--buttonSecondary);
+    text-align: left;
+    color: var(--buttonSecondary);
+    font-weight: 600;
+    font-size: 18px;
+    }
+
+    td{
+
+        padding: 20px;
+        border-bottom: 1px solid var(--textColor);
+        width: 30px;
+        color: var(--textColor);
+        font-weight: 600;
+        font-size: 16px;
+    }
+}
+.selectTable{
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--buttonSecondary);
+    background-color: white;
+    display: inline-block;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.deletebtn{
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+
+    img{
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.status{
+    text-transform: uppercase;
+}
+
+.contImg{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+
+    img{
+        width: 100%;
+        height: 100%;
+    }
+}
+
+
+@media (max-width: 765px){
+    .tableContainer{
+        width: 100%;
+        overflow-x: auto;
+    }
+}
+
+@media (min-width: 766px) and (max-width: 1023px){
+    .tableContainer{
+        width: 700px;
+        overflow-x: auto;
+    }
+ }
+

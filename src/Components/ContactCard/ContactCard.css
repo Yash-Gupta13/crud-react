@@ -1,0 +1,107 @@
+.contactContainer{
+    width: 450px;
+    height: 450px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #E6E6E6;
+    background-color: white;
+    box-shadow: 0px 4px 12px 0px rgba(173,173,173,1);
+    border-radius: 5px;
+    position: relative;
+}
+
+.contactHeading{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 13px;
+    border: none;
+    border-bottom: 3px solid #E6E6E6;
+
+    h1{
+        font-size: 40px;
+        font-weight: 400;
+        color: var(--textColor);
+    }
+}
+
+.hrLine{
+    border-bottom: 1px solid ;
+}
+
+.profileImg{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+
+    img{
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.contactContent{
+    padding: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    p{
+        font-size: 20px;
+        color: #5e5e5e;
+    }
+}
+
+.result{
+    color: var(--textColor);
+
+}
+
+.contactEdit{
+    display: flex;
+    padding: 13px;
+    padding-top: 50px;
+    align-items: center;
+    justify-content: space-between;
+    p{
+        font-size: 20px;
+        color: #5e5e5e;
+    }
+    
+}
+
+.contactEditIcon{
+    width: 70px;
+    display: flex;
+    /* height: 30px; */
+    gap: 20px;
+
+   
+
+    img{
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+}
+
+.noDataMessage{
+    display: flex;
+    font-size: 25px;
+    padding: 13px;
+    color: var(--textColor);
+}
+
+@media (max-width: 765px){
+    .contactContainer{
+        width: 100%;
+    }
+}
+
+@media (min-width: 766px) and (max-width: 1024px){
+    
+ }
+
+
+
