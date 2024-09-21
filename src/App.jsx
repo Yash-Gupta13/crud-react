@@ -10,10 +10,12 @@ function App() {
   const [contactList, setContactList] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
   const [page, setPage] = useState(1);
-  const [rows, setRows] = useState(10);
-  
+  const [rows, setRows] = useState(10); // Default number of rows
+
+  // Fetch data based on current page and rows
   const fetchData = async () => {
     try {
+      const offset = (page - 1) * rows; // Calculate offset based on current page
       const response = await axios.get(
         `https://demobackend.web2.99cloudhosting.com/user/list_contacts?rows=${rows}&page=${page}&offset=${offset}`
       );
@@ -28,9 +30,10 @@ function App() {
 
   useEffect(() => {
     fetchData();
-  }, [page]); 
+  }, [page, rows]); // Fetch data whenever the page or rows change
+
   const handleNextPage = () => {
-    if (page * rows < totalRecords) { 
+    if (page * rows < totalRecords) { // Check if there's more data to load
       setPage(prevPage => prevPage + 1);
     }
   };
@@ -39,6 +42,11 @@ function App() {
     if (page > 1) {
       setPage(prevPage => prevPage - 1);
     }
+  };
+
+  const handleRowSelection = (event) => {
+    setRows(Number(event.target.value)); // Update the rows based on user selection
+    setPage(1); // Reset to the first page when rows change
   };
 
   return (
@@ -55,6 +63,14 @@ function App() {
             <Table contactList={contactList} />
           </div>
         </div>
+      </div>
+      <div>
+        <label htmlFor="rows">Select rows per page: </label>
+        <select id="rows" value={rows} onChange={handleRowSelection}>
+          <option value={2}>2</option>
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+        </select>
       </div>
       <div>Total records: {totalRecords}</div>
       <div>
