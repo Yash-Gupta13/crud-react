@@ -10,8 +10,9 @@ function App() {
   const [contactList, setContactList] = useState([]);
 
   const [singleContactDetails , setSingleContactDetails] = useState('');
-  const [singleContactDetailsId, setSingleContactsDetailsId] = useState('');
-
+  const [singleContactDetailsId, setSingleContactsDetailsId] = useState(null);
+  const [isEdit , setIsEdit] = useState(false);
+  const [editId , setEditId] = useState(null);
   const handleSingleDetails = (data)=>{
     setSingleContactDetails(data.data);
     setSingleContactsDetailsId(data.id)
@@ -30,6 +31,16 @@ function App() {
     }
   }
 
+  const handleEdit = (id)=>{
+    setIsEdit(true);
+    setEditId(id);
+  }
+
+  const updatedDone = ()=>{
+    setIsEdit(false);
+    setEditId(null);
+  }
+
   const handleDelete = async(id)=>{
     const confirm = window.confirm("Are you sure you want to delete?")
 
@@ -44,12 +55,13 @@ function App() {
     );
 
     setSingleContactDetails('');
-    setSingleContactsDetailsId('');
+    setSingleContactsDetailsId(null);
 
     fetchData();
     
   }
 
+  console.log("Main app id",editId," ",singleContactDetailsId)
   useEffect(()=>{
     fetchData();
   },[])
@@ -59,8 +71,8 @@ function App() {
         <Sidebar />
         <div className="mainContent">
           <div className="mainCard">
-            <ContactCard data={singleContactDetails} id={singleContactDetailsId} onDelete={handleDelete}/>
-            <AddContactCard />
+            <ContactCard data={singleContactDetails} id={singleContactDetailsId} onDelete={handleDelete} onEdit={handleEdit}/>
+            <AddContactCard editId={editId} isEdit={isEdit} handleUpdate={updatedDone}/>
           </div>
 
           <div className="div">

@@ -4,58 +4,9 @@ import moment from 'moment';
 
 
 
-const ContactCard = ({data,id,onDelete}) => {
-
-console.log(data,id)
-  // let formattedDate = "No data available";
-  // if (data && data.generated) {
-  //   try {
-  //     const date = new Date(data.generated * 1000);
-  //     formattedDate = format(date, "MMMM d, yyyy h:mm aaa");
-  //   } catch (error) {
-  //     console.error("Error formatting date:", error);
-  //   }
-  // }
-
-  // const formatDate = (date) => {
-  //   const options = {
-  //     year: '2-digit', // 2-digit year (e.g., 21 for 2021)
-  //     month: '2-digit', // 2-digit month (e.g., 06 for June)
-  //     day: '2-digit', // 2-digit day (e.g., 19)
-  //   };
-  //   return new Date(date).toLocaleDateString('en-US', options);
-  // };
-
-  // const formatTime = (date) => {
-  //   const options = {
-  //     hour: 'numeric', // 12-hour format (e.g., 7)
-  //     minute: '2-digit', // 2-digit minute (e.g., 41)
-  //     hour12: true, // Use 12-hour format with AM/PM
-  //   };
-  //   return new Date(date).toLocaleTimeString('en-US', options);
-  // };
-
-  // const currentDate = new Date();
-
-  const handleDelete = () => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete this contact?"
-    );
-    if (!isConfirmed) {
-      return;
-    }
-    
-   
-    
-  };
-
-  const handleEdit = ()=>{
-    
-  }
-
+const ContactCard = ({data,id,onDelete,onEdit}) => {
+  console.log(`Contact card`,id)
   const date = new Date();
-
-
   return (
     <div className="contactContainer">
       <div className="contactHeading">
@@ -109,7 +60,7 @@ console.log(data,id)
               <div onClick={()=>onDelete(id)}>
                 <img src={RecycleBin} alt="" />
               </div>
-              <div onClick={handleEdit}>
+              <div onClick={()=>onEdit(id)}>
                 <img src={Edit} alt="" />
               </div>
             </div>

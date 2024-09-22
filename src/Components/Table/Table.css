@@ -36,7 +36,7 @@ table{
     width: 20px;
     height: 20px;
     border: 2px solid var(--buttonSecondary);
-    background-color: white;
+    background-color: rgb(255, 254, 254);
     display: inline-block;
     border-radius: 3px;
     cursor: pointer;

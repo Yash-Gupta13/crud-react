@@ -1,9 +1,9 @@
 import moment from "moment";
 import "./AddContactCard.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
-const AddContactCard = () => {
+const AddContactCard = ({ editId, isEdit, handleUpdate }) => {
   const date = new Date();
   const timeStamp = date.getTime();
   const formattedDate = moment(timeStamp).format("MMMM D, YYYY h:mm A");
@@ -17,7 +17,6 @@ const AddContactCard = () => {
     Notes: "",
     Image: null,
   };
-
   const [formData, setFormData] = useState(formIntialState);
 
   const handleInputChange = (e) => {
@@ -32,50 +31,117 @@ const AddContactCard = () => {
     if (file) {
       setFormData({
         ...formData,
-        Image:file
-      })
+        Image: file,
+      });
     }
   };
+
+  console.log(editId)
+
+  useEffect(() => {
+    if (editId && isEdit) {
+      try {
+        const fetchEditableData = async () => {
+          const res = await axios.get(
+            `https://demobackend.web2.99cloudhosting.com/user/get_details?id=${editId}`
+          );
+
+          console.log(res.data.contact_details);
+          const {
+            contact_address,
+            contact_name,
+            contact_notes,
+            contact_number,
+            contact_pic,
+            contact_status,
+          } = res?.data.contact_details;
+
+          setFormData({
+            Name: contact_name || "",
+            Address: contact_address || "",
+            Number: contact_number || "",
+            CreatedOn: formattedDate, // You can keep this unchanged
+            ContactStatus: contact_status || "Active",
+            Notes: contact_notes || "",
+            Image: null, // Handle image update separately
+          });
+        };
+
+        fetchEditableData();
+      } catch (error) {
+        console.log(
+          `Something went wrong in fetching the editable data`,
+          error
+        );
+      }
+    }
+  }, [editId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const apiData = {
-        contact_address: formData.Address,
-        contact_name: formData.Name,
-        contact_notes: formData.Notes,
-        created_on: moment(timeStamp).format("YYYY-MM-DD"),
-        contact_status: formData.ContactStatus,
-        contact_number: formData.Number,
-        contact_city: "",
-        contact_email: "",
-        contact_state: "",
-      };
-      const res = await axios.post(
-        `https://demobackend.web2.99cloudhosting.com/user/add_contact`,
-        apiData
-      );
+      if (isEdit) {
+        const apiData = {
+          contact_address: formData.Address,
+          contact_name: formData.Name,
+          contact_notes: formData.Notes,
+          contact_number: formData.Number,
+          contact_city: "",
+          contact_email: "",
+          contact_state: "",
+          contact_id: editId,
+        };
 
-      const id = res.data.record.id;
-      if(formData.Image === null){
-        alert('Please select the image');
-        return;
-      }
-      const image = await axios.post(
-        `https://demobackend.web2.99cloudhosting.com/profile_pic/add_contact_pic`,
-        {
-          contact_id: id,
-          photo: formData.Image,
-        },
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+        console.log(`Under the handleSubmit and is edit is true`,apiData);
+        const res = await axios.post(
+          `https://demobackend.web2.99cloudhosting.com/user/update_contact_details`,
+          {
+            apiData,
+          }
+        );
+
+        console.log(res);
+      } else {
+        const apiData = {
+          contact_address: formData.Address,
+          contact_name: formData.Name,
+          contact_notes: formData.Notes,
+          created_on: moment(timeStamp).format("YYYY-MM-DD"),
+          contact_status: formData.ContactStatus,
+          contact_number: formData.Number,
+          contact_city: "",
+          contact_email: "",
+          contact_state: "",
+        };
+
+        const res = await axios.post(
+          `https://demobackend.web2.99cloudhosting.com/user/add_contact`,
+          apiData
+        );
+
+        const id = res.data.record.id;
+        if (formData.Image === null) {
+          alert("Please select the image");
+          return;
         }
-      );
+        const image = await axios.post(
+          `https://demobackend.web2.99cloudhosting.com/profile_pic/add_contact_pic`,
+          {
+            contact_id: id,
+            photo: formData.Image,
+          },
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
 
-      alert("Added Successfully");
+        alert("Added Successfully");
+      }
+
       setFormData(formIntialState);
+      handleUpdate();
     } catch (error) {
       console.log(`There is somethinh error in submitting the form`, error);
     }
@@ -84,7 +150,7 @@ const AddContactCard = () => {
   return (
     <div className="addCardContainer">
       <div className="addCardHeading">
-        <h1>Add New Contact Card</h1>
+        <h1>{isEdit ? "Edit Contact Card" : "Add New Contact Card"}</h1>
       </div>
       <div className="formContent">
         <form onSubmit={handleSubmit} method="POST">
@@ -159,7 +225,7 @@ const AddContactCard = () => {
               onChange={handleFileChange}
             />
           </div>
-          <button type="Submit">Submit</button>
+          <button type="Submit">{editId ? "Update" : "Submit"}</button>
         </form>
       </div>
     </div>

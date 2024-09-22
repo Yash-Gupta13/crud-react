@@ -10,15 +10,15 @@ import axios from "axios";
 
 
 const Table = ({ contactList, handleChildData ,onDelete}) => {
-  const [isSelect, setIsSelect] = useState(false);
+  
+  
   const handleRowClick = async (id) => {
-    setIsSelect(!isSelect);
+    
     const res = await axios.get(
       `https://demobackend.web2.99cloudhosting.com/user/get_details?id=${id}`
     );
 
     handleChildData({data:res.data.contact_details,id:id});
-    console.log(res.data);
   };
 
   
@@ -42,9 +42,9 @@ const Table = ({ contactList, handleChildData ,onDelete}) => {
         <tbody>
           {contactList?.map((contact, index) => (
             <tr key={index}>
-              <td className="checkbox">
+              <td>
                 <span
-                  className={`selectTable ${isSelect} ? "selected" : ""`}
+                  className={`selectTable selected`}
                   onClick={() => handleRowClick(contact.id)}
                 ></span>
               </td>
