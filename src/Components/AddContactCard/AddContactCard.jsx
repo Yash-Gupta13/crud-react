@@ -6,7 +6,9 @@ import axios from "axios";
 const AddContactCard = ({ editId, isEdit, handleUpdate,renderData }) => {
   const date = new Date();
   const timeStamp = date.getTime();
+  console.log(timeStamp);
   const formattedDate = moment(timeStamp).format("MMMM D, YYYY h:mm A");
+  const [fileInputKey, setFileInputKey] = useState(Date.now());
 
   const formIntialState = {
     Name: "",
@@ -36,7 +38,6 @@ const AddContactCard = ({ editId, isEdit, handleUpdate,renderData }) => {
         Image: file,
       });
     }
-    e.target.value = null;
   };
 
   useEffect(() => {
@@ -121,6 +122,7 @@ const AddContactCard = ({ editId, isEdit, handleUpdate,renderData }) => {
           apiData
         );
 
+        console.log(res.data.record)
         const id = res.data.record.id;
         if (formData.Image === null) {
           alert("Please select the image");
@@ -142,8 +144,10 @@ const AddContactCard = ({ editId, isEdit, handleUpdate,renderData }) => {
 
       setFormData({
         ...formIntialState,
-        CreatedOn: formattedDate, 
+        CreatedOn: formattedDate,
+
       });
+      setFileInputKey(Date.now());
       renderData();
       handleUpdate();
        alert(isEdit ? "Updated Successfully" : "Added Successfully");
@@ -228,6 +232,7 @@ const AddContactCard = ({ editId, isEdit, handleUpdate,renderData }) => {
               name="Image"
               accept="image/*"
               onChange={handleFileChange}
+              key={fileInputKey}
             />
           </div>
           {isEdit && editId && formData.Image ? (

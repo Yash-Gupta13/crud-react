@@ -59,7 +59,7 @@ const Table = ({ contactList, handleChildData ,onDelete}) => {
               <td>{`${contact.contact_name}, ${contact.contact_address}`}</td>
               <td>{contact.contact_number}</td>
               <td>
-                {moment.unix(contact.created_on).format("DD/MM/YY hh:mm A")}
+                {moment(contact.created_on*1000).format("DD/MM/YY hh:mm A")}
               </td>
               <td className="status">{contact.contact_status}</td>
               <td>{contact.contact_notes}</td>
