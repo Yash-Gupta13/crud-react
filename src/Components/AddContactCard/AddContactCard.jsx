@@ -3,7 +3,7 @@ import "./AddContactCard.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const AddContactCard = ({ editId, isEdit, handleUpdate,renderData }) => {
+const AddContactCard = ({ editId, isEdit, handleUpdate, renderData }) => {
   const date = new Date();
   const timeStamp = date.getTime();
   console.log(timeStamp);
@@ -28,7 +28,6 @@ const AddContactCard = ({ editId, isEdit, handleUpdate,renderData }) => {
       [name]: value,
     });
   };
-
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -62,10 +61,10 @@ const AddContactCard = ({ editId, isEdit, handleUpdate,renderData }) => {
             Name: contact_name || "",
             Address: contact_address || "",
             Number: contact_number || "",
-            CreatedOn: formattedDate, 
+            CreatedOn: formattedDate,
             ContactStatus: contact_status || "Active",
             Notes: contact_notes || "",
-            Image: contact_pic, 
+            Image: contact_pic,
           });
         };
 
@@ -77,7 +76,7 @@ const AddContactCard = ({ editId, isEdit, handleUpdate,renderData }) => {
         );
       }
     }
-  }, [editId,isEdit]);
+  }, [editId, isEdit]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -88,22 +87,20 @@ const AddContactCard = ({ editId, isEdit, handleUpdate,renderData }) => {
           contact_name: formData.Name,
           contact_notes: formData.Notes,
           contact_number: formData.Number,
+          contact_status : formData.ContactStatus,
           contact_city: "",
           contact_email: "",
           contact_state: "",
           contact_id: editId,
         };
 
-        console.log(`Under the handleSubmit and is edit is true`,apiData);
+        console.log(`Under the handleSubmit and is edit is true`, apiData);
         const res = await axios.post(
           `https://demobackend.web2.99cloudhosting.com/user/update_contact_details`,
           {
             ...apiData,
-            
           }
         );
-
-
       } else {
         const apiData = {
           contact_address: formData.Address,
@@ -122,7 +119,7 @@ const AddContactCard = ({ editId, isEdit, handleUpdate,renderData }) => {
           apiData
         );
 
-        console.log(res.data.record)
+        console.log(res.data.record);
         const id = res.data.record.id;
         if (formData.Image === null) {
           alert("Please select the image");
@@ -145,12 +142,11 @@ const AddContactCard = ({ editId, isEdit, handleUpdate,renderData }) => {
       setFormData({
         ...formIntialState,
         CreatedOn: formattedDate,
-
       });
       setFileInputKey(Date.now());
       renderData();
       handleUpdate();
-       alert(isEdit ? "Updated Successfully" : "Added Successfully");
+      alert(isEdit ? "Updated Successfully" : "Added Successfully");
     } catch (error) {
       console.log(`There is something error in submitting the form`, error);
     }

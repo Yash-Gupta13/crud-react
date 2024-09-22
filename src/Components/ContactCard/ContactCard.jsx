@@ -36,7 +36,7 @@ const ContactCard = ({data,id,onDelete,onEdit}) => {
             <p>
               Created On :{" "}
               <span className="result">
-                {moment.unix(data.generated).format("MMMM D, YYYY h:mm A")}
+                {moment.unix(data.generated).format("MMMM D, YYYY")}
               </span>
             </p>
             <p>

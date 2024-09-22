@@ -1,28 +1,16 @@
-
 import "./Table.css";
 import { RecycleBin } from "../../assets";
-import { Profile } from "../../assets";
-import { useEffect, useState } from "react";
 import moment from "moment";
 import axios from "axios";
 
-
-
-
-const Table = ({ contactList, handleChildData ,onDelete}) => {
-  
-  
+const Table = ({ contactList, handleChildData, onDelete }) => {
   const handleRowClick = async (id) => {
-    
     const res = await axios.get(
       `https://demobackend.web2.99cloudhosting.com/user/get_details?id=${id}`
     );
 
-    handleChildData({data:res.data.contact_details,id:id});
+    handleChildData({ data: res.data.contact_details, id: id });
   };
-
-  
-  
 
   return (
     <div className="tableContainer">
@@ -59,7 +47,7 @@ const Table = ({ contactList, handleChildData ,onDelete}) => {
               <td>{`${contact.contact_name}, ${contact.contact_address}`}</td>
               <td>{contact.contact_number}</td>
               <td>
-                {moment(contact.created_on*1000).format("DD/MM/YY hh:mm A")}
+                {moment(contact.created_on * 1000).format("DD/MM/YY")}
               </td>
               <td className="status">{contact.contact_status}</td>
               <td>{contact.contact_notes}</td>
