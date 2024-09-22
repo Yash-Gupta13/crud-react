@@ -3,7 +3,7 @@ import "./AddContactCard.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const AddContactCard = ({ editId, isEdit, handleUpdate }) => {
+const AddContactCard = ({ editId, isEdit, handleUpdate,renderData }) => {
   const date = new Date();
   const timeStamp = date.getTime();
   const formattedDate = moment(timeStamp).format("MMMM D, YYYY h:mm A");
@@ -26,6 +26,8 @@ const AddContactCard = ({ editId, isEdit, handleUpdate }) => {
       [name]: value,
     });
   };
+
+
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -34,9 +36,8 @@ const AddContactCard = ({ editId, isEdit, handleUpdate }) => {
         Image: file,
       });
     }
+    e.target.value = null;
   };
-
-  console.log(editId)
 
   useEffect(() => {
     if (editId && isEdit) {
@@ -60,10 +61,10 @@ const AddContactCard = ({ editId, isEdit, handleUpdate }) => {
             Name: contact_name || "",
             Address: contact_address || "",
             Number: contact_number || "",
-            CreatedOn: formattedDate, // You can keep this unchanged
+            CreatedOn: formattedDate, 
             ContactStatus: contact_status || "Active",
             Notes: contact_notes || "",
-            Image: null, // Handle image update separately
+            Image: contact_pic, 
           });
         };
 
@@ -75,7 +76,7 @@ const AddContactCard = ({ editId, isEdit, handleUpdate }) => {
         );
       }
     }
-  }, [editId]);
+  }, [editId,isEdit]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -96,11 +97,12 @@ const AddContactCard = ({ editId, isEdit, handleUpdate }) => {
         const res = await axios.post(
           `https://demobackend.web2.99cloudhosting.com/user/update_contact_details`,
           {
-            apiData,
+            ...apiData,
+            
           }
         );
 
-        console.log(res);
+
       } else {
         const apiData = {
           contact_address: formData.Address,
@@ -136,14 +138,17 @@ const AddContactCard = ({ editId, isEdit, handleUpdate }) => {
             },
           }
         );
-
-        alert("Added Successfully");
       }
 
-      setFormData(formIntialState);
+      setFormData({
+        ...formIntialState,
+        CreatedOn: formattedDate, 
+      });
+      renderData();
       handleUpdate();
+       alert(isEdit ? "Updated Successfully" : "Added Successfully");
     } catch (error) {
-      console.log(`There is somethinh error in submitting the form`, error);
+      console.log(`There is something error in submitting the form`, error);
     }
   };
 
@@ -225,6 +230,16 @@ const AddContactCard = ({ editId, isEdit, handleUpdate }) => {
               onChange={handleFileChange}
             />
           </div>
+          {isEdit && editId && formData.Image ? (
+            <div className="editImage">
+              <img
+                src={`https://demobackend.web2.99cloudhosting.com/profile_pic/list_contact_pic?contact_id=${editId}`}
+                alt=""
+              />
+            </div>
+          ) : (
+            <></>
+          )}
           <button type="Submit">{editId ? "Update" : "Submit"}</button>
         </form>
       </div>

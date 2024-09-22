@@ -9,16 +9,17 @@ import axios from "axios";
 function App() {
   const [contactList, setContactList] = useState([]);
 
-  const [singleContactDetails , setSingleContactDetails] = useState('');
+  const [singleContactDetails, setSingleContactDetails] = useState("");
   const [singleContactDetailsId, setSingleContactsDetailsId] = useState(null);
-  const [isEdit , setIsEdit] = useState(false);
-  const [editId , setEditId] = useState(null);
-  const handleSingleDetails = (data)=>{
-    setSingleContactDetails(data.data);
-    setSingleContactsDetailsId(data.id)
-  }
+  const [isEdit, setIsEdit] = useState(false);
+  const [editId, setEditId] = useState(null);
 
-  const fetchData = async()=>{
+  const handleSingleDetails = (data) => {
+    setSingleContactDetails(data.data);
+    setSingleContactsDetailsId(data.id);
+  };
+
+  const fetchData = async () => {
     try {
       const response = await axios.get(
         `https://demobackend.web2.99cloudhosting.com/user/list_contacts?rows=20`
@@ -26,57 +27,75 @@ function App() {
 
       const contacts = response.data.record;
       setContactList(contacts);
-    } catch (error) {
-      
-    }
-  }
+    } catch (error) {}
+  };
 
-  const handleEdit = (id)=>{
+  const handleEdit = (id) => {
     setIsEdit(true);
     setEditId(id);
-  }
+  };
 
-  const updatedDone = ()=>{
+  const updatedDone = async () => {
+    if (editId) {
+      const res = await axios.get(
+        `https://demobackend.web2.99cloudhosting.com/user/get_details?id=${editId}`
+      );
+      setSingleContactDetails(res.data.contact_details);
+    }
+
     setIsEdit(false);
     setEditId(null);
-  }
+  };
 
-  const handleDelete = async(id)=>{
-    const confirm = window.confirm("Are you sure you want to delete?")
+  const handleDelete = async (id) => {
+    const confirm = window.confirm("Are you sure you want to delete?");
 
-    if(!confirm){
+    if (!confirm) {
       return;
     }
 
     const res = await axios.post(
-      `https://demobackend.web2.99cloudhosting.com/user/delete_contact`,{
-        "contact_id":id
+      `https://demobackend.web2.99cloudhosting.com/user/delete_contact`,
+      {
+        contact_id: id,
       }
     );
 
-    setSingleContactDetails('');
+    setSingleContactDetails("");
     setSingleContactsDetailsId(null);
 
     fetchData();
-    
-  }
+  };
 
-  console.log("Main app id",editId," ",singleContactDetailsId)
-  useEffect(()=>{
+  useEffect(() => {
     fetchData();
-  },[])
+  }, []);
   return (
     <>
       <div className="mainContainer">
         <Sidebar />
         <div className="mainContent">
           <div className="mainCard">
-            <ContactCard data={singleContactDetails} id={singleContactDetailsId} onDelete={handleDelete} onEdit={handleEdit}/>
-            <AddContactCard editId={editId} isEdit={isEdit} handleUpdate={updatedDone}/>
+            <ContactCard
+              data={singleContactDetails}
+              id={singleContactDetailsId}
+              onDelete={handleDelete}
+              onEdit={handleEdit}
+            />
+            <AddContactCard
+              editId={editId}
+              isEdit={isEdit}
+              handleUpdate={updatedDone}
+              renderData={fetchData}
+            />
           </div>
 
           <div className="div">
-            <Table contactList={contactList} handleChildData ={handleSingleDetails} onDelete={handleDelete}/>
+            <Table
+              contactList={contactList}
+              handleChildData={handleSingleDetails}
+              onDelete={handleDelete}
+            />
           </div>
         </div>
       </div>
