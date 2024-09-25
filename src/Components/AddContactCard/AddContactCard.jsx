@@ -1,16 +1,19 @@
 import moment from "moment";
 import "./AddContactCard.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
+import { Camera } from "../../assets/index";
 
 const AddContactCard = ({ editId, isEdit, handleUpdate, renderData }) => {
   const date = new Date();
   const timeStamp = date.getTime();
-  console.log(timeStamp);
   const formattedDate = moment(timeStamp).format("MMMM D, YYYY h:mm A");
-  const [fileInputKey, setFileInputKey] = useState(Date.now());
 
-  const formIntialState = {
+  // File input state
+  const [fileInputKey, setFileInputKey] = useState(Date.now());
+  const [fileName, setFileName] = useState(""); // State to store selected file name
+
+  const formInitialState = {
     Name: "",
     Address: "",
     Number: "",
@@ -19,8 +22,10 @@ const AddContactCard = ({ editId, isEdit, handleUpdate, renderData }) => {
     Notes: "",
     Image: null,
   };
-  const [formData, setFormData] = useState(formIntialState);
 
+  const [formData, setFormData] = useState(formInitialState);
+
+  // Handle input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -29,6 +34,7 @@ const AddContactCard = ({ editId, isEdit, handleUpdate, renderData }) => {
     });
   };
 
+  // Handle file change
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -36,18 +42,27 @@ const AddContactCard = ({ editId, isEdit, handleUpdate, renderData }) => {
         ...formData,
         Image: file,
       });
+      setFileName(file.name); // Set file name in state
     }
   };
 
+  const fileInputRef = useRef(null);
+
+  const handleChooseFileClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click(); // Programmatically trigger the file input click
+    }
+  };
+
+  // Fetch the editable data on edit
   useEffect(() => {
     if (editId && isEdit) {
-      try {
-        const fetchEditableData = async () => {
+      const fetchEditableData = async () => {
+        try {
           const res = await axios.get(
             `https://demobackend.web2.99cloudhosting.com/user/get_details?id=${editId}`
           );
 
-          console.log(res.data.contact_details);
           const {
             contact_address,
             contact_name,
@@ -64,73 +79,57 @@ const AddContactCard = ({ editId, isEdit, handleUpdate, renderData }) => {
             CreatedOn: formattedDate,
             ContactStatus: contact_status || "Active",
             Notes: contact_notes || "",
-            Image: contact_pic,
+            Image: contact_pic, // Assuming this is a URL of the image
           });
-        };
+        } catch (error) {
+          console.error("Error fetching editable data", error);
+        }
+      };
 
-        fetchEditableData();
-      } catch (error) {
-        console.log(
-          `Something went wrong in fetching the editable data`,
-          error
-        );
-      }
+      fetchEditableData();
     }
   }, [editId, isEdit]);
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (isEdit) {
-        const apiData = {
-          contact_address: formData.Address,
-          contact_name: formData.Name,
-          contact_notes: formData.Notes,
-          contact_number: formData.Number,
-          contact_status : formData.ContactStatus,
-          contact_city: "",
-          contact_email: "",
-          contact_state: "",
-          contact_id: editId,
-        };
+      const apiData = {
+        contact_address: formData.Address,
+        contact_name: formData.Name,
+        contact_notes: formData.Notes,
+        contact_number: formData.Number,
+        contact_status: formData.ContactStatus,
+        contact_city: "",
+        contact_email: "",
+        contact_state: "",
+      };
 
-        console.log(`Under the handleSubmit and is edit is true`, apiData);
-        const res = await axios.post(
+      let res;
+      if (isEdit) {
+        apiData.contact_id = editId;
+        res = await axios.post(
           `https://demobackend.web2.99cloudhosting.com/user/update_contact_details`,
-          {
-            ...apiData,
-          }
+          apiData
         );
       } else {
-        const apiData = {
-          contact_address: formData.Address,
-          contact_name: formData.Name,
-          contact_notes: formData.Notes,
-          created_on: moment(timeStamp).format("YYYY-MM-DD"),
-          contact_status: formData.ContactStatus,
-          contact_number: formData.Number,
-          contact_city: "",
-          contact_email: "",
-          contact_state: "",
-        };
-
-        const res = await axios.post(
+        res = await axios.post(
           `https://demobackend.web2.99cloudhosting.com/user/add_contact`,
           apiData
         );
+      }
 
-        console.log(res.data.record);
-        const id = res.data.record.id;
-        if (formData.Image === null) {
-          alert("Please select the image");
-          return;
-        }
-        const image = await axios.post(
+      const id = res.data.record?.id || editId;
+
+      // Image upload if a new image is selected
+      if (formData.Image && typeof formData.Image !== "string") {
+        const formDataObj = new FormData();
+        formDataObj.append("contact_id", id);
+        formDataObj.append("photo", formData.Image);
+
+        await axios.post(
           `https://demobackend.web2.99cloudhosting.com/profile_pic/add_contact_pic`,
-          {
-            contact_id: id,
-            photo: formData.Image,
-          },
+          formDataObj,
           {
             headers: {
               "Content-Type": "multipart/form-data",
@@ -139,16 +138,18 @@ const AddContactCard = ({ editId, isEdit, handleUpdate, renderData }) => {
         );
       }
 
+      // Reset form after submission
       setFormData({
-        ...formIntialState,
+        ...formInitialState,
         CreatedOn: formattedDate,
       });
-      setFileInputKey(Date.now());
+      setFileInputKey(Date.now()); // Reset the file input
+      setFileName(""); // Reset file name
       renderData();
       handleUpdate();
       alert(isEdit ? "Updated Successfully" : "Added Successfully");
     } catch (error) {
-      console.log(`There is something error in submitting the form`, error);
+      console.error("Error submitting form", error);
     }
   };
 
@@ -158,9 +159,9 @@ const AddContactCard = ({ editId, isEdit, handleUpdate, renderData }) => {
         <h1>{isEdit ? "Edit Contact Card" : "Add New Contact Card"}</h1>
       </div>
       <div className="formContent">
-        <form onSubmit={handleSubmit} method="POST">
-          <div>
-            <label>Name:</label>
+        <form onSubmit={handleSubmit}>
+          <div className="formInput">
+            <label>Name</label>
             <input
               type="text"
               name="Name"
@@ -169,8 +170,8 @@ const AddContactCard = ({ editId, isEdit, handleUpdate, renderData }) => {
             />
           </div>
 
-          <div>
-            <label>Address:</label>
+          <div className="formInput">
+            <label>Address</label>
             <input
               type="text"
               name="Address"
@@ -179,8 +180,8 @@ const AddContactCard = ({ editId, isEdit, handleUpdate, renderData }) => {
             />
           </div>
 
-          <div>
-            <label>Number:</label>
+          <div className="formInput">
+            <label>Number</label>
             <input
               type="text"
               name="Number"
@@ -189,18 +190,18 @@ const AddContactCard = ({ editId, isEdit, handleUpdate, renderData }) => {
             />
           </div>
 
-          <div>
-            <label>Created On:</label>
+          <div className="formInput">
+            <label>Created On</label>
             <input
               type="text"
               name="CreatedOn"
               value={formData.CreatedOn}
-              readOnly // The CreatedOn field is read-only
+              readOnly // Read-only for created date
             />
           </div>
 
-          <div>
-            <label>Contact Status:</label>
+          <div className="formInput">
+            <label>Contact Status</label>
             <select
               name="ContactStatus"
               value={formData.ContactStatus}
@@ -211,8 +212,8 @@ const AddContactCard = ({ editId, isEdit, handleUpdate, renderData }) => {
             </select>
           </div>
 
-          <div>
-            <label>Notes:</label>
+          <div className="formInput">
+            <label>Notes</label>
             <input
               type="text"
               name="Notes"
@@ -221,30 +222,55 @@ const AddContactCard = ({ editId, isEdit, handleUpdate, renderData }) => {
             />
           </div>
 
-          <div>
-            <label>Upload Media:</label>
-            <input
-              type="file"
-              name="Image"
-              accept="image/*"
-              onChange={handleFileChange}
-              key={fileInputKey}
-            />
-          </div>
-          {isEdit && editId && formData.Image ? (
-            <div className="editImage">
-              <img
-                src={`https://demobackend.web2.99cloudhosting.com/profile_pic/list_contact_pic?contact_id=${editId}`}
-                alt=""
+          <div className="formInput">
+            <label>Attachment File</label>
+            <div className="imageUpload">
+              <div className="uploadImage">
+                <img src={Camera} alt="Upload File" />
+              </div>
+              <div className="fileSize">
+                {fileName ? (
+                  <span>{fileName}</span>
+                ) : (
+                  <>
+                    <span>Upload File</span>
+                    <span>Size: 600x150px, JPG, SVG, PNG, Max: 200kb</span>
+                  </>
+                )}
+              </div>
+              <input
+                type="file"
+                name="Image"
+                accept="image/*"
+                onChange={handleFileChange}
+                key={fileInputKey}
+                ref={fileInputRef}
+                className="fileInput"
+                style={{ display: "none" }}
               />
+
+              {isEdit && editId && formData.Image ? (
+                <div className="editImage">
+                  <img
+                    src={`https://demobackend.web2.99cloudhosting.com/profile_pic/list_contact_pic?contact_id=${editId}`}
+                    alt="Current contact"
+                  />
+                </div>
+              ) : (
+                <p className="chooseFileButton" onClick={handleChooseFileClick}>
+                  Choose File
+                </p>
+              )}
             </div>
-          ) : (
-            <></>
-          )}
-          <button type="Submit">{editId ? "Update" : "Submit"}</button>
+          </div>
+
+          <button type="submit" className="submitButton">
+            {isEdit ? "Update" : "Submit"}
+          </button>
         </form>
       </div>
     </div>
   );
 };
+
 export default AddContactCard;

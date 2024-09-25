@@ -29,6 +29,7 @@
 
 .search{
     padding-top: 20px;
+    cursor: pointer;
     img{
         width: 30px;   
         
