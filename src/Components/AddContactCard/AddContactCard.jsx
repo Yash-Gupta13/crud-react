@@ -93,43 +93,58 @@ const AddContactCard = ({ editId, isEdit, handleUpdate, renderData }) => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     try {
-      const apiData = {
-        contact_address: formData.Address,
-        contact_name: formData.Name,
-        contact_notes: formData.Notes,
-        contact_number: formData.Number,
-        contact_status: formData.ContactStatus,
-        contact_city: "",
-        contact_email: "",
-        contact_state: "",
-      };
-
-      let res;
       if (isEdit) {
-        apiData.contact_id = editId;
-        res = await axios.post(
+        const apiData = {
+          contact_address: formData.Address,
+          contact_name: formData.Name,
+          contact_notes: formData.Notes,
+          contact_number: formData.Number,
+          contact_status : formData.ContactStatus,
+          contact_city: "",
+          contact_email: "",
+          contact_state: "",
+          contact_id: editId,
+        };
+
+        console.log("Under the handleSubmit and is edit is true", apiData);
+        const res = await axios.post(
           `https://demobackend.web2.99cloudhosting.com/user/update_contact_details`,
-          apiData
+          {
+            ...apiData,
+          }
         );
       } else {
-        res = await axios.post(
+        const apiData = {
+          contact_address: formData.Address,
+          contact_name: formData.Name,
+          contact_notes: formData.Notes,
+          created_on: moment(timeStamp).format("YYYY-MM-DD"),
+          contact_status: formData.ContactStatus,
+          contact_number: formData.Number,
+          contact_city: "",
+          contact_email: "",
+          contact_state: "",
+        };
+
+        const res = await axios.post(
           `https://demobackend.web2.99cloudhosting.com/user/add_contact`,
           apiData
         );
-      }
 
-      const id = res.data.record?.id || editId;
-
-      // Image upload if a new image is selected
-      if (formData.Image && typeof formData.Image !== "string") {
-        const formDataObj = new FormData();
-        formDataObj.append("contact_id", id);
-        formDataObj.append("photo", formData.Image);
-
-        await axios.post(
+        console.log(res.data.record);
+        const id = res.data.record.id;
+        if (formData.Image === null) {
+          alert("Please select the image");
+          return;
+        }
+        const image = await axios.post(
           `https://demobackend.web2.99cloudhosting.com/profile_pic/add_contact_pic`,
-          formDataObj,
+          {
+            contact_id: id,
+            photo: formData.Image,
+          },
           {
             headers: {
               "Content-Type": "multipart/form-data",
@@ -138,18 +153,16 @@ const AddContactCard = ({ editId, isEdit, handleUpdate, renderData }) => {
         );
       }
 
-      // Reset form after submission
       setFormData({
         ...formInitialState,
         CreatedOn: formattedDate,
       });
-      setFileInputKey(Date.now()); // Reset the file input
-      setFileName(""); // Reset file name
+      setFileInputKey(Date.now());
       renderData();
       handleUpdate();
       alert(isEdit ? "Updated Successfully" : "Added Successfully");
     } catch (error) {
-      console.error("Error submitting form", error);
+      console.log("There is something error in submitting the form", error);
     }
   };
 
